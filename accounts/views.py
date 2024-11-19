@@ -12,6 +12,26 @@ from django.contrib.auth import login
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 # 2 funcoes iguais no mesmo slide puta kiu pariu fudeu de vez aaa
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import JSONRenderer
+class accountsClasse(APIView):
+    def get(self, request):
+        return Response({'msg': 'Resposta do método GET'}, status.HTTP_200_OK)
+    
+    def post(self, request):
+        return Response({'msg': 'Resposta do método POST'}, status.HTTP_200_OK)
+
+@api_view(('GET',))
+@renderer_classes((JSONRenderer,))   
+def accountsGET(request):
+    return Response({'msg': 'Resposta da função GET'}, status.HTTP_200_OK)
+    
+@api_view(('POST',))
+@renderer_classes((JSONRenderer,))
+def accountsPOST(request):
+    return Response({'msg': 'Resposta da função POST'}, status.HTTP_200_OK)
+
 class CustomAuthToken(ObtainAuthToken):
     @swagger_auto_schema(
         operation_summary='Obter o token de autenticação',
