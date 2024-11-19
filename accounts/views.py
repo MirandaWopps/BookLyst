@@ -49,3 +49,13 @@ class CustomAuthToken(ObtainAuthToken):
             status.HTTP_401_UNAUTHORIZED: 'Unauthorized request.',
         },
     )
+    def post(self, request, *args, **kwargs):
+        user = authenticate(
+            username=request.data.get('username'),
+            password=request.data.get('password')
+        )
+        if user:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
