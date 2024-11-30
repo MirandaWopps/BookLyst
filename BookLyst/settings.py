@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure--9a^z@6g!27jaze)gve&2*j1zff!eqfr-ys2mg#u7_o0vh)@=k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # incluidos
     'rest_framework',
+    'corsheaders',
     'accounts',
+    'listLivro',
 ]
 
 MIDDLEWARE = [
@@ -50,6 +52,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # para usar o CORS
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'BookLyst.urls'
@@ -129,3 +133,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Para permitir CORS
+CORS_ORIGIN_WHITELIST = [
+    'http://0.0.0.0:8080',
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+    # Adicione outras origens permitidas, se necessário
+]
+
+CORS_ORIGIN_ALLOW_ALL = True
