@@ -20,24 +20,26 @@ class LivroView(APIView):
 
 
 class newLivroView(APIView):
-    def post(self, request, *args, **kwargs):
-        image = request.FILES.get('image')  # Obtém a imagem
-        metadata = request.data.get('metadata')  # Obtém o metadata
+    parser_classes = [MultiPartParser, FormParser]
 
-        # Verifica se a imagem e o metadata foram enviados
-        if image and metadata:
-            # Você pode querer verificar o tipo de imagem, por exemplo, se for um arquivo de imagem válido
-            if image.content_type.startswith('image/'):  # Verifica se é uma imagem
-                return Response({
-                    "message": "Upload successful!",
-                    "image_name": image.name,
-                    "metadata": metadata,
-                }, status=status.HTTP_201_CREATED)
-            else:
-                return Response({
-                    "message": "The uploaded file is not a valid image."
-                }, status=status.HTTP_400_BAD_REQUEST)
+    def post(self, request, *args, **kwargs):
+        titulo = request.data.get('titulo')
+        autor = request.data.get('autor')
+        capa = request.FILES.get('capa')  # Para arquivos
+        categoria = request.data.get('categoria')
+        sinopse = request.data.get('sinopse')
+
+        # Verifique se os dados estão presentes
+        if titulo and autor and categoria:
+            # Salvar no banco de dados (ajuste para seu modelo)
+            livro = Livro.objects.create(
+                titulo=titulo,
+                autor=autor,
+                categoria=categoria,
+                sinopse=sinopse,
+                capa=capa,
+            )
+            return Response({'message': 'Livro criado com sucesso!'}, status=201)
         else:
-            return Response({
-                "message": "Missing image or metadata."
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Dados incompletos.'}, status=400)
+
