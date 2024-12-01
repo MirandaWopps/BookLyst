@@ -2,7 +2,7 @@ from django.db import models
 from django.core.files.storage import FileSystemStorage
 
 # Create your models here.
-fs = FileSystemStorage(location="VersoLivro/static/img/VersoLivro")
+fs = FileSystemStorage(location="livros/static/img/livros")
 
 class Livro(models.Model):
     TIPO_CATEGORIA = {
