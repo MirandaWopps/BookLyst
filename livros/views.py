@@ -16,6 +16,25 @@ class LivroView(APIView):
         # de 1 resultado usando many=True
         serializer = LivroSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def delete(self, request):
+        id_erro = ""
+        erro = False
+
+        for id in request.data:  # Espera-se que request.data seja uma lista de IDs
+            try:
+                livro = Livro.objects.get(id=id)
+                livro.delete()
+            except Livro.DoesNotExist:  # Captura caso o ID não exista
+                id_erro += f"{id} "
+                erro = True
+
+        if erro:
+            return Response(
+                {'error': f'Os seguintes itens não foram encontrados: [{id_erro.strip()}]'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 
@@ -67,8 +86,6 @@ class upLivroView(APIView):
             if serializer.is_valid():
                 serializer.save()  # Salva os dados atualizados no banco
                 return Response(serializer.data, status=status.HTTP_200_OK)
-            # Caso o livro não seja encontrado, retorna erro 404
-            print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             # Caso o livro não seja encontrado, retorna erro 404
@@ -83,4 +100,3 @@ class upLivroView(APIView):
             return Livro.objects.get(id=id_arg)
         except Livro.DoesNotExist:
             return None
-
