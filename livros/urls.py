@@ -7,4 +7,5 @@ app_name = 'livros'
 urlpatterns = [
     path("lista/", views.LivroView.as_view(), name='lista-livros'),
     path('livro/', views.newLivroView.as_view(), name='um-livro'),
+    path('livro/<id_arg>/', views.upLivroView.as_view(), name='edita-livro'),
 ]
