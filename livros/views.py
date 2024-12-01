@@ -20,16 +20,23 @@ class LivroView(APIView):
 
 
 class newLivroView(APIView):
-    def POST(self, request, *args, **kwargs):
-        image = request.FILES.get('image')
-        metadata = request.data.get('metadata')
+    def post(self, request, *args, **kwargs):
+        image = request.FILES.get('image')  # Obtém a imagem
+        metadata = request.data.get('metadata')  # Obtém o metadata
 
+        # Verifica se a imagem e o metadata foram enviados
         if image and metadata:
-            return Response({
-                "message": "Upload successful!",
-                "image_name": image.name,
-                "metadata": metadata,
-            }, status=status.HTTP_201_CREATED)
+            # Você pode querer verificar o tipo de imagem, por exemplo, se for um arquivo de imagem válido
+            if image.content_type.startswith('image/'):  # Verifica se é uma imagem
+                return Response({
+                    "message": "Upload successful!",
+                    "image_name": image.name,
+                    "metadata": metadata,
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return Response({
+                    "message": "The uploaded file is not a valid image."
+                }, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({
                 "message": "Missing image or metadata."
