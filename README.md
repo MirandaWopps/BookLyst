@@ -1,6 +1,6 @@
 # INF1407(PROG WEB) Front e BackEnd !
 Esse é o repositório principal.
-A explicação sobre o **backend** e **frontend**. 
+A explicação sobre o **backend** e **frontend**. Lembre de ligar as 2 imagens docker e se for verificar o swagger pelo menos 1 a imagem docker do backend.
 
 ---
 ## Backend
