@@ -1,1 +1,1 @@
-admin:admin -> admin password
+THE FINAL BRANCH IS THE "NOVO" BRANCH !
