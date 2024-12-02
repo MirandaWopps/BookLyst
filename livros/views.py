@@ -4,7 +4,8 @@ from livros.models import Livro
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser
-import json  # Para manipulação de JSON, se necessário
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 
 class LivroView(APIView):
@@ -39,6 +40,8 @@ class LivroView(APIView):
 
 
 class newLivroView(APIView):
+    #authentication_classes = [TokenAuthentication]
+    #permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
@@ -66,6 +69,8 @@ class newLivroView(APIView):
 
 
 class upLivroView(APIView):
+   # authentication_classes = [TokenAuthentication]
+   # permission_classes = [IsAuthenticated]
     # Método GET para recuperar o livro baseado no ID
     def get(self, request, id_arg):
         livro = self.get_book_by_id(id_arg)
@@ -86,10 +91,10 @@ class upLivroView(APIView):
             if serializer.is_valid():
                 serializer.save()  # Salva os dados atualizados no banco
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            print("Erro no serializer:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             # Caso o livro não seja encontrado, retorna erro 404
-            print(serializer.errors)
             return Response({
                 'msg': f'Livro com id #{id_arg} não existe'
             }, status=status.HTTP_404_NOT_FOUND)

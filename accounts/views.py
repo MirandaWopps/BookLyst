@@ -4,14 +4,11 @@ from rest_framework import status
 # Autenticação
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
-from django.contrib.auth import authenticate
-from django.contrib.auth import login
-from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login, logout
+from rest_framework.exceptions import AuthenticationFailed
 # Swagger
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-
-# Create your views here.
 
 class CustomAuthToken(ObtainAuthToken):
 
@@ -43,7 +40,7 @@ class CustomAuthToken(ObtainAuthToken):
                 login(request, user)
                 return Response({'token': token.key})
         return Response({'detail': 'Credenciais inválidas'}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
     @swagger_auto_schema(
         operation_summary='Obtém o username do usuário',
         operation_description="Retorna o username do usuário ou 'visitante' se o token for inválido",
@@ -80,7 +77,6 @@ class CustomAuthToken(ObtainAuthToken):
         except (Token.DoesNotExist, AttributeError):
             # Caso o token seja inválido ou ausente
             return Response({'username': 'visitante'}, status=status.HTTP_404_NOT_FOUND)
-        
     
     @swagger_auto_schema(
         operation_description='Realiza logout do usuário, apagando o seu token',
@@ -101,7 +97,6 @@ class CustomAuthToken(ObtainAuthToken):
             status.HTTP_500_INTERNAL_SERVER_ERROR: 'Erro no servidor ao realizar o logout.',
         },
     )
-
     def delete(self, request):
         try:
             # Extrai o token do cabeçalho Authorization
@@ -120,3 +115,75 @@ class CustomAuthToken(ObtainAuthToken):
             return Response({'msg': 'Logout bem-sucedido.'}, status=status.HTTP_200_OK)
         else:
             return Response({'msg': 'Usuário não autenticado.'}, status=status.HTTP_403_FORBIDDEN)
+        
+    @swagger_auto_schema(
+        operation_description='Troca a senha do usuário e atualiza o token em caso de sucesso.',
+        operation_summary='Troca a senha do usuário.',
+        manual_parameters=[ 
+            openapi.Parameter(
+                'Authorization',
+                openapi.IN_HEADER,
+                type=openapi.TYPE_STRING,
+                description='Token de autenticação no formato "Token <valor do token>"',
+            ),
+        ],
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'old_password': openapi.Schema(type=openapi.TYPE_STRING, description='Senha atual do usuário.'),
+                'new_password1': openapi.Schema(type=openapi.TYPE_STRING, description='Nova senha que o usuário deseja definir.'),
+                'new_password2': openapi.Schema(type=openapi.TYPE_STRING, description='Confirmação da nova senha.'),
+            },
+            required=['old_password', 'new_password1', 'new_password2'],
+        ),
+        responses={
+            status.HTTP_200_OK: openapi.Response(
+                description="Senha alterada com sucesso.",
+                examples={
+                    "application/json": {
+                        "message": "Senha alterada com sucesso."
+                    }
+                }
+            ),
+            status.HTTP_400_BAD_REQUEST: openapi.Response(
+                description="Erro na solicitação.",
+                examples={
+                    "application/json": {
+                        "old_password": ["Senha atual incorreta."],
+                        "new_password1": ["A nova senha não atende aos requisitos de segurança."]
+                    }
+                }
+            ),
+        },
+    )
+    def put(self, request):
+        try:
+            token = request.META.get('HTTP_AUTHORIZATION').split(' ')[1]  # token
+            token_obj = Token.objects.get(key=token)
+            user = token_obj.user
+        except (Token.DoesNotExist, IndexError):
+            return Response({'msg': 'Token inválido ou não fornecido.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password1')
+        confirm_password = request.data.get('new_password2')
+
+        if new_password != confirm_password:
+            return Response({'error': 'As novas senhas não coincidem.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verificar se a senha atual está correta
+        if user.check_password(old_password):
+            # Alterar a senha e atualizar o token
+            user.set_password(new_password)
+            user.save()
+                
+            # Atualizar token
+            try:
+                token = Token.objects.get(user=user)
+                token.delete()
+                token, _ = Token.objects.get_or_create(user=user)
+            except Token.DoesNotExist:
+                pass
+            return Response({'token': token.key, "message": "Senha alterada com sucesso."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"old_password": ["Senha atual incorreta."]}, status=status.HTTP_400_BAD_REQUEST)
