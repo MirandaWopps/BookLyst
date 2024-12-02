@@ -5,9 +5,9 @@ A explicação sobre o **backend** e **frontend**.
 ---
 ## Backend
 repositorio (esse, na branch novo)
-imagem()
+imagem(https://hub.docker.com/repository/docker/miyaaaa/backend/general)
 
-
+Necessário tirar de mode DEBUG para tirar o swagger. Isto é, no settings.py mude de False para True.
 
 
 --
