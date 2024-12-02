@@ -20,6 +20,7 @@ Funciona:
 Não funciona:
   Scripts do swagger ausentes.
   Recuperação de usuário.
+  
 --
 
 
