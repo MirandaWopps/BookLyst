@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,8 +40,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     #minhas aplicacoes
     'rest_framework',
-    'livros',
+    'rest_framework.authtoken',
     'corsheaders',
+    'drf_yasg', # swagger
+    'coreapi', # swagger
+    'livros',
+    'accounts',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +67,14 @@ CORS_ORIGIN_WHITELIST = [
     'http://localhost:8080',
     # Adicione outras origens permitidas, se necessário
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS':
+    'rest_framework.schemas.coreapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 ROOT_URLCONF = 'BookLyst.urls'
 
@@ -135,3 +148,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Caminho absoluto para o diretório onde os arquivos estáticos serão coletados
+STATIC_URL = '/static/'
+
+# Para ambientes de produção, defina STATIC_ROOT para um diretório absoluto
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
