@@ -1,6 +1,6 @@
 # INF1407(PROG WEB)  BackEnd do projeto Booklyst !
-Esse é o repositório principal.
-A explicação sobre o **backend**. Lembre de ligar as 2 imagens docker e se for verificar o swagger pelo menos 1 a imagem docker do backend.
+Esse é o repositório principal feito por Rafael Feliciano e Lucas Ebrenz.
+A explicação sobre o **backend**. Lembre de ligar as 2 imagens docker e se for verificar o swagger pelo menos 1 a imagem docker do backend. 
 
 ---
 ## Backend
